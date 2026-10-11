@@ -28,6 +28,7 @@ jobs:
           node sync-browser-test.cjs
           node prf-browser-test.cjs
           node capacity-browser-test.cjs
+          node capacity-sync-test.cjs
   deploy:
     needs: browser-tests
     runs-on: ubuntu-latest
