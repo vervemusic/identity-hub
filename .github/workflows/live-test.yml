@@ -1,0 +1,22 @@
+name: Test published application
+on:
+  push:
+    paths:
+      - browser-test.cjs
+      - .github/workflows/live-test.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright@1.61.1
+      - run: npx playwright install --with-deps chromium
+      - run: node browser-test.cjs
+        env:
+          HUB_TEST_URL: https://vervemusic.github.io/identity-hub/
