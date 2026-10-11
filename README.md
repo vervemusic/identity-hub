@@ -1,42 +1,51 @@
 # Identity Hub
 
-A local account directory with search, categories, account add/edit/delete, HTTPS login-page buttons, JSON import/export, and duplicate detection.
+Working application: https://vervemusic.github.io/identity-hub/
+
+GitHub write access was repaired, the application uploaded, and GitHub Pages enabled. The dashboard implements account creation, editing and deletion, identity search, category filtering, HTTPS login-page buttons, JSON import/export and duplicate detection. It works offline after its first successful online load.
+
+## Verified results — October 11, 2026
+
+| Check | Result and evidence |
+| --- | --- |
+| Model validation, search, import and deduplication | All 3 unit tests passed locally and in Pages CI. |
+| Published application in Chromium, Firefox, WebKit and Android browser emulation | [All four suites passed](https://github.com/vervemusic/identity-hub/actions/runs/38151966347). CRUD, persistence, search, categories, export/import, duplicate skipping, rejected secret fields, responsive layout, safe links and actual login-button navigation verified. |
+| Invalid imports and injection handling | Seven invalid-import cases leave the existing list unchanged. HTML names render as plain text. Canceled deletion retains the account. Manifest parsing and Chromium installation eligibility passed. |
+| WebKit offline operation | Passed with the local origin server actually stopped. Playwright's offline switch has a reported WebKit defect, so this test uses a real origin outage instead. |
+| Windows installation and operation | [Passed on a Windows hosted runner](https://github.com/vervemusic/identity-hub/actions/runs/38151151025): live functional and robustness suites, actual PWA installation, OS app-state query, standalone launch and saved-account persistence. |
+| Android OS operation and installation | [Passed on an Android 15 emulator](https://github.com/vervemusic/identity-hub/actions/runs/38152784886): creation, search, persistence, offline reload with HTTPS blocked inside the emulator, failed uncached requests, network recovery, native installation confirmation, home-screen launch in standalone mode and retained accounts. |
+
+Android's tested installation created a home-screen application; the emulator did not mint a separate WebAPK package. Physical Windows/Android devices and their biometric hardware have not been tested. Third-party credential sign-in was not performed. The tests use fictional accounts in separate test profiles.
+
+The installation tests exposed an app identity that resolved to the domain root. The manifest now explicitly identifies `/identity-hub/`, preventing identity collisions with other applications on the same GitHub Pages domain. Windows installation was verified against this correction.
 
 ## Data boundaries
 
-Only `name`, `username`, `category` and `url` fields are accepted. Unknown fields reject the whole import before storage changes. Password-manager exports must not be imported. Login URLs must use HTTPS without embedded credentials, query parameters or fragments. No password, authentication token or recovery-code field exists. Do not put secrets in metadata fields.
+Only `name`, `username`, `category` and `url` fields are accepted. Unknown fields reject the whole import before storage changes. Password-manager exports must not be imported. Login URLs must use HTTPS without embedded credentials, query parameters or fragments. No password, authentication-token or recovery-code field exists. Arbitrary text cannot reliably be recognized as a secret: never put secrets in metadata fields.
 
-Account metadata is unencrypted in this browser's local storage. It is not sent to GitHub or a server. JSON export contains this metadata only; there is no cloud synchronization. The public repository and deployment contain application code and fictional samples only.
+Account metadata is unencrypted in this browser's local storage. The application does not upload that list to GitHub or another server. JSON export contains this metadata only. There is no cloud synchronization. The public repository and deployment contain application code and fictional samples, not personal credentials. The page's security policy blocks native form submissions and inline scripts.
 
-## Install and offline use
+## Installation
 
-Manifest, 192/512 PNG icons, standalone display, installation prompt handling and offline application-shell cache are implemented. When published over HTTPS, supported Windows Edge/Chrome and Android Chrome browsers can offer installation. Actual Windows/Android installation and hardware biometric prompts have not been tested.
+The manifest, 192/512 PNG icons, standalone display, browser installation prompt handling and offline shell cache are implemented and verified as described above. Use the app's Install app button when offered, or the browser's installation menu. Windows Chrome/Edge and Android Chrome are the intended installation paths.
 
-## Verification
+## Authentication investigation and unfinished work
 
-`npm test`: three tests covering metadata validation/search, unsafe URLs and credential-field rejection, transactional import validation and deduplication. Passed locally and on GitHub Actions.
+Windows Hello can approve website-specific passkeys through WebAuthn; Android can use device PIN or biometrics. Passkeys are scoped to the destination relying party. A Hub passkey would not sign the user into unrelated websites.
 
-`browser-test.cjs`: Playwright browser checks for account creation/edit/deletion, persistence after reload, search/category filtering, JSON export, valid/invalid import, duplicate skipping, offline reload and narrow-screen overflow. Passed in Chromium on GitHub Actions October 11, 2026. The workflow runs this test before deployment.
+Proton Pass supports browser autofill, passkeys and biometric vault unlock on supported platforms. Hub provides a link to its official web vault. It does not read or synchronize the vault, perform autofill, or transmit credentials.
 
-## Authentication investigation
+Not implemented: Hub biometric locking, Hub passkey enrollment/authentication, an encrypted credential vault, direct Proton Pass vault integration, automatic third-party sign-in, and cross-device account synchronization. No personal account list has been retrieved or seeded. These features are not included in the passing tests.
 
-Windows Hello can approve website-specific passkeys through WebAuthn. Android passkeys support device PIN and biometrics. Passkeys are scoped to a relying party; approving a Hub passkey cannot sign the user into unrelated sites. A secure Hub account-login service would require enrollment, fresh challenges and assertion verification; none is implemented here.
-
-Proton Pass supports browser-extension autofill and passkeys, Android credential-provider use, and Windows biometric vault unlock (paid account required for Windows biometric unlock). Hub currently links to the official Proton Pass web vault. It does not read the vault, synchronize vault items, perform autofill, or send credentials. No direct vault API integration has been implemented or tested.
-
-Sources:
+Sources investigated:
 - https://learn.microsoft.com/en-us/windows/security/identity-protection/passkeys/
 - https://developer.android.com/identity/passkeys
 - https://proton.me/support/pass-use-passkeys
 - https://proton.me/support/how-to-set-up-proton-pass-for-windows
-- https://developer.chrome.com/docs/lighthouse/pwa/installable-manifest
+- https://proton.me/support/biometric-setup-mobile
+- https://github.com/microsoft/playwright/issues/42775
+- https://chromium.googlesource.com/chromium/src/+/main/components/webapps/docs/android_testing_guide.md
 
-## Deployment and live verification
+## Reproducible tests
 
-GitHub write authorization repaired; application uploaded; Pages publishing enabled; deployment succeeded October 11, 2026 (run 38149110995, attempt 2).
-
-Working application: https://vervemusic.github.io/identity-hub/
-
-Published app checked in cloud Chrome: page loads, fictional sample cards render, identity search and category filtering work, accounts can be created/edited/deleted, saved accounts survive reload, URL query parameters are rejected, JSON export downloads, and re-import skips duplicates. Offline reload and narrow-screen layout passed the automated Chromium suite on localhost. Destination login links were inspected for correct HTTPS hrefs; third-party sign-in itself was not tested.
-
-Remaining: real Windows/Android installation tests; hardware biometrics and Hub-specific passkey enrollment/authentication; Proton Pass vault integration. PWA support is implemented, but device installation is unverified. No personal account list was retrieved or seeded. This is an account directory, not a credential vault or universal Authorize Login system.
+`npm test` runs the model suite. GitHub Actions supplies the browsers and operating-system test environments. See `browser-test.cjs`, `robustness-test.cjs`, `webkit-offline.cjs`, `install-test.cjs` and `android-test.cjs`, and the workflows in `.github/workflows/`. Successful final runs are linked above; earlier diagnostic failures were investigated and corrected.
