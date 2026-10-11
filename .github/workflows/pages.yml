@@ -8,10 +8,11 @@ permissions:
   pages: write
   id-token: write
 concurrency:
-  group: pages
+  group: identity-hub-validation-v2
   cancel-in-progress: true
 jobs:
   browser-tests:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
