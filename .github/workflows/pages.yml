@@ -24,6 +24,7 @@ jobs:
           python3 -m http.server 8765 &
           node browser-test.cjs
           node security-browser-test.cjs
+          node sync-browser-test.cjs
   deploy:
     needs: browser-tests
     runs-on: ubuntu-latest
