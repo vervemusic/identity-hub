@@ -1,7 +1,7 @@
 name: Test published application on Android OS
 on:
   push:
-    paths: [.github/workflows/android-test.yml]
+    paths: [.github/workflows/android-test.yml, android-test.cjs]
   workflow_dispatch:
 permissions:
   contents: read
@@ -28,5 +28,6 @@ jobs:
           script: |
             adb shell pm list packages com.android.chrome
             adb root
+            adb wait-for-device
             adb shell 'echo "chrome --no-first-run --disable-fre --enable-features=CommandLineOnNonRootedDevices" > /data/local/tmp/chrome-command-line'
             node android-test.cjs
