@@ -10,5 +10,5 @@ export function normalize(item){
  a.url=url.href;return a;
 }
 export function parseImport(text){const data=JSON.parse(text);if(!Array.isArray(data)||data.length>10000)throw Error('Import a JSON array of up to 10,000 accounts.');return data.map(normalize);}
-export function mergeAccounts(current,incoming){const result=[...current];let added=0;for(const a of incoming){if(!result.some(b=>b.url===a.url&&b.username.toLowerCase()===a.username.toLowerCase())){result.push(a);added++;}}if(result.length>10000)throw Error('Account limit is 10,000.');return {accounts:result,added};}
+export function mergeAccounts(current,incoming){const result=[...current],seen=new Set(current.map(a=>JSON.stringify([a.url,a.username.toLowerCase()])));let added=0;for(const a of incoming){const id=JSON.stringify([a.url,a.username.toLowerCase()]);if(!seen.has(id)){seen.add(id);result.push(a);added++;}}if(result.length>10000)throw Error('Account limit is 10,000.');return {accounts:result,added};}
 export function matches(a,q,category){return (!category||a.category===category)&&fields.some(k=>a[k].toLowerCase().includes(q.toLowerCase()));}

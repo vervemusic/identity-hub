@@ -1,5 +1,5 @@
 import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
-const files=['index.html','app.js','model.js','security.js','style.css','sw.js','manifest.webmanifest','icon-192.png','icon-512.png'];
+const files=['index.html','app.js','model.js','security.js','storage.js','style.css','sw.js','manifest.webmanifest','icon-192.png','icon-512.png'];
 const assets=Object.fromEntries(files.map(f=>[f,readFileSync(f).toString('base64')]));
 const types={html:'text/html; charset=utf-8',js:'text/javascript; charset=utf-8',css:'text/css; charset=utf-8',webmanifest:'application/manifest+json',png:'image/png'};
 const server=readFileSync('sync-server.js','utf8').replace('export async function','async function');
