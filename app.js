@@ -51,7 +51,7 @@ $('sync-now').onclick=()=>syncNow(true);
 $('sync-remote').onclick=async()=>{const conflict=syncConflict;if(!conflict)return;try{await pullRemote(conflict.remote,conflict.etag,true);syncConflict=null;$('sync-conflict').hidden=true;syncMessage('Synced directory restored; previous local ciphertext retained as a recovery backup.');}catch(e){syncMessage('Restore failed: '+e.message);}};
 $('sync-local').onclick=async()=>{const conflict=syncConflict;if(!conflict||!confirm('Replace the synced directory with this device’s complete list? Other devices will receive its edits and deletions.'))return;try{await pushRemote(conflict.etag);syncConflict=null;$('sync-conflict').hidden=true;syncMessage('This device’s encrypted directory synced.');}catch(e){syncMessage(e.message);}};
 $('sync-backup').onclick=()=>{const value=localStorage.getItem('identity-hub-conflict-backup-v1');if(!value){syncMessage('No conflict recovery backup on this device.');return;}const url=URL.createObjectURL(new Blob([value],{type:'application/json'}));const a=element('a','');a.href=url;a.download='identity-hub-conflict-encrypted.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
-fetch('./api/capabilities',{cache:'no-store'}).then(async r=>{if(r.ok&&!r.redirected&&(await r.json()).privateSync){hostedSync=true;$('sync-panel').hidden=false;if(syncState())syncNow(false);}}).catch(()=>{});
+fetch('./api/capabilities',{cache:'no-store'}).then(async r=>{if(r.status===401){$('sync-signin').hidden=false;}if(r.ok&&!r.redirected&&(await r.json()).privateSync){hostedSync=true;$('sync-panel').hidden=false;if(syncState())syncNow(false);}}).catch(()=>{});
 setInterval(()=>{if(syncState())syncNow(false);},30000);
 window.addEventListener('online',()=>{if(syncState())syncNow(false);});
 
