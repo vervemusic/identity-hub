@@ -1,12 +1,15 @@
 name: Test published application on Android OS
 on:
-  push:
-    paths: [.github/workflows/android-test.yml, android-test.cjs]
+  workflow_run:
+    workflows: [Test and deploy Pages]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
   android:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

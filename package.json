@@ -1,1 +1,8 @@
-{"name":"identity-hub","private":true,"type":"module","scripts":{"test":"node --test model.test.js"}}
+{
+  "name": "identity-hub",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test model.test.js security.test.js"
+  }
+}
