@@ -28,3 +28,6 @@ jobs:
           TEST_BROWSER: ${{ matrix.browser }}
       - if: matrix.browser == 'chromium'
         run: node robustness-test.cjs
+
+      - if: matrix.browser == 'webkit'
+        run: node webkit-offline.cjs
