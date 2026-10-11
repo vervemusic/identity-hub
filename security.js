@@ -2,7 +2,7 @@ import {parseImport} from './model.js';
 export const VAULT='identity-hub-encrypted-v1', DEVICE='identity-hub-device-v1';
 const enc=new TextEncoder(),dec=new TextDecoder();
 export const random=n=>crypto.getRandomValues(new Uint8Array(n));
-export const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b)));
+export const b64=b=>{const data=new Uint8Array(b);let out='';for(let i=0;i<data.length;i+=8192)out+=String.fromCharCode(...data.subarray(i,i+8192));return btoa(out);};
 export const bytes=s=>{if(typeof s!=='string'||s.length>3000000||!/^[A-Za-z0-9+/]*={0,2}$/.test(s))throw Error('Invalid encrypted data.');return Uint8Array.from(atob(s),c=>c.charCodeAt(0));};
 export function validate(e){if(!e||e.format!=='identity-hub-encrypted'||e.version!==1||e.iterations!==600000||Object.keys(e).some(k=>!['format','version','iterations','salt','iv','data'].includes(k))||bytes(e.salt).length!==16||bytes(e.iv).length!==12||bytes(e.data).length<16)throw Error('Unsupported encrypted backup.');return e;}
 export async function passwordKey(password,salt){const material=await crypto.subtle.importKey('raw',enc.encode(password),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',hash:'SHA-256',salt:bytes(salt),iterations:600000},material,{name:'AES-GCM',length:256},true,['encrypt','decrypt']);}
