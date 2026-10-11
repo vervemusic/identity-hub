@@ -1,0 +1,21 @@
+name: Test published application on Windows
+on:
+  push:
+    paths: [.github/workflows/windows-test.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows-test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright@1.61.1
+      - run: npx playwright install chromium
+      - run: node browser-test.cjs
+        env:
+          HUB_TEST_URL: https://vervemusic.github.io/identity-hub/
+      - run: node robustness-test.cjs
