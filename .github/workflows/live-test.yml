@@ -10,6 +10,10 @@ permissions:
   contents: read
 jobs:
   live-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit, android-emulated]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,9 +21,10 @@ jobs:
         with:
           node-version: '22'
       - run: npm install --no-save playwright@1.61.1
-      - run: npx playwright install --with-deps chromium
-      - run: |
-          node browser-test.cjs
-          node robustness-test.cjs
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: node browser-test.cjs
         env:
           HUB_TEST_URL: https://vervemusic.github.io/identity-hub/
+          TEST_BROWSER: ${{ matrix.browser }}
+      - if: matrix.browser == 'chromium'
+        run: node robustness-test.cjs
