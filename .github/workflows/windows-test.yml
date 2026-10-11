@@ -24,6 +24,9 @@ jobs:
       - run: node security-browser-test.cjs
         env:
           HUB_TEST_URL: https://vervemusic.github.io/identity-hub/
+      - run: node prf-browser-test.cjs
+        env:
+          HUB_TEST_URL: https://vervemusic.github.io/identity-hub/
       - run: node robustness-test.cjs
 
       - run: node install-test.cjs
