@@ -16,7 +16,7 @@ Manifest, 192/512 PNG icons, standalone display, installation prompt handling an
 
 `npm test`: three tests covering metadata validation/search, unsafe URLs and credential-field rejection, transactional import validation and deduplication. Passed locally and on GitHub Actions.
 
-`browser-test.cjs`: Playwright browser checks for account creation/edit/deletion, persistence after reload, search/category filtering, JSON export, valid/invalid import, duplicate skipping, offline reload and narrow-screen overflow. Passed on GitHub Actions October 11, 2026, run 38149110995. The workflow installs Chromium and runs this test before deployment.
+`browser-test.cjs`: Playwright browser checks for account creation/edit/deletion, persistence after reload, search/category filtering, JSON export, valid/invalid import, duplicate skipping, offline reload and narrow-screen overflow. Passed in Chromium on GitHub Actions October 11, 2026. The workflow runs this test before deployment.
 
 ## Authentication investigation
 
@@ -31,10 +31,12 @@ Sources:
 - https://proton.me/support/how-to-set-up-proton-pass-for-windows
 - https://developer.chrome.com/docs/lighthouse/pwa/installable-manifest
 
-## Deployment status
+## Deployment and live verification
 
-GitHub write authorization was repaired and application files uploaded October 11, 2026. First-time Pages activation was rejected by GitHub with `Resource not accessible by integration`. The repository owner must select GitHub Actions as the Pages publishing source. No working live URL has yet been verified.
+GitHub write authorization repaired; application uploaded; Pages publishing enabled; deployment succeeded October 11, 2026 (run 38149110995, attempt 2).
 
-Target URL after successful deployment: https://vervemusic.github.io/identity-hub/
+Working application: https://vervemusic.github.io/identity-hub/
 
-Remaining: Pages activation/deployment and published-site verification; device installation tests; biometric/passkey login integration; Proton Pass vault integration. No personal account list has been retrieved or seeded.
+Published app checked in cloud Chrome: page loads, fictional sample cards render, identity search and category filtering work, accounts can be created/edited/deleted, saved accounts survive reload, URL query parameters are rejected, JSON export downloads, and re-import skips duplicates. Offline reload and narrow-screen layout passed the automated Chromium suite on localhost. Destination login links were inspected for correct HTTPS hrefs; third-party sign-in itself was not tested.
+
+Remaining: real Windows/Android installation tests; hardware biometrics and Hub-specific passkey enrollment/authentication; Proton Pass vault integration. PWA support is implemented, but device installation is unverified. No personal account list was retrieved or seeded. This is an account directory, not a credential vault or universal Authorize Login system.
