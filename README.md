@@ -23,7 +23,7 @@ The installation tests exposed an app identity that resolved to the domain root.
 
 Only `name`, `username`, `category` and `url` fields are accepted. Unknown fields reject the whole import before storage changes. Password-manager exports must not be imported. Login URLs must use HTTPS without embedded credentials, query parameters or fragments. No password, authentication-token or recovery-code field exists. Arbitrary text cannot reliably be recognized as a secret: never put secrets in metadata fields.
 
-In the original version, account metadata was unencrypted in local storage. The security update below adds optional encrypted protection. The application does not upload that list to GitHub or another server. JSON export contains this metadata only. There is no cloud synchronization. The public repository and deployment contain application code and fictional samples, not personal credentials. The page's security policy blocks native form submissions and inline scripts.
+In the original version, account metadata was unencrypted in local storage. The security update below adds optional encrypted protection. The application does not upload that list to GitHub or another server. JSON export contains this metadata only. The public Pages edition does not have cloud synchronization; the private hosted edition added below does. The public repository and deployment contain application code and fictional samples, not personal credentials. The page's security policy blocks native form submissions and inline scripts.
 
 ## Installation
 
@@ -35,7 +35,7 @@ Windows Hello can approve website-specific passkeys through WebAuthn; Android ca
 
 Proton Pass supports browser autofill, passkeys and biometric vault unlock on supported platforms. Hub provides a link to its official web vault. It does not read or synchronize the vault, perform autofill, or transmit credentials.
 
-At the original test baseline, Hub biometric locking and passkey enrollment were not implemented. The update below adds PRF device unlock and encrypted directory storage. An encrypted credential vault, direct Proton Pass vault reading, automatic third-party sign-in and automatic cross-device synchronization remain outside the implemented functionality. No personal account list has been retrieved or seeded. These features are not included in the passing tests.
+At the original test baseline, Hub biometric locking and passkey enrollment were not implemented. The update below adds PRF device unlock and encrypted directory storage. An encrypted credential vault, direct Proton Pass vault reading, automatic third-party sign-in remain outside the implemented functionality. Private encrypted cross-device synchronization is implemented in the hosted edition described below. No personal account list has been retrieved or seeded. These features are not included in the passing tests.
 
 Sources investigated:
 - https://learn.microsoft.com/en-us/windows/security/identity-protection/passkeys/
@@ -103,3 +103,5 @@ The automatic-sync tests use two isolated browser profiles and the real server h
 - The private deployment succeeded. Its access policy lists only the owner and no groups. Live HTTP checks returned 403 for unauthenticated access, 200 for authorized service access to the shell, and 401 for a forged visitor-identity header with service access. Service access intentionally does not impersonate a signed-in visitor.
 - Hosted signed-in synchronization against production R2, private-origin installation, physical biometric/PIN hardware and third-party Proton autofill/sign-in are not yet end-to-end verified. The sync logic and atomic storage adapter are tested separately; private publication and access enforcement are verified live.
 - Android OS installation verification is being rerun after intermittent emulator native-dialog failures. Earlier installation passed on the original app; that alone is not proof of the final security update.
+
+Capacity: up to 10,000 entries, subject to a 3 MB serialized import/encrypted-envelope limit and browser storage quota. Encryption validates the complete envelope before persistence, so an oversized change cannot save a vault that the reader would reject. These are independent limits; 10,000 unusually long entries can exceed the byte limit.
