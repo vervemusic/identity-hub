@@ -15,9 +15,9 @@ export async function syncHandler(request,env){
  const match=request.headers.get('if-match'),none=request.headers.get('if-none-match');
  if(!match&&none!=='*')return reply({error:'Version precondition required'},428);
  if(match&&none)return reply({error:'Ambiguous preconditions'},400);
- if(Number(request.headers.get('content-length')||0)>3000000)return reply({error:'Too large'},413);
+ if(Number(request.headers.get('content-length')||0)>32000000)return reply({error:'Too large'},413);
  let size=0,chunks=[];const reader=request.body?.getReader();if(!reader)return reply({error:'Body required'},400);
- while(true){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>3000000){await reader.cancel();return reply({error:'Too large'},413);}chunks.push(value);}
+ while(true){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>32000000){await reader.cancel();return reply({error:'Too large'},413);}chunks.push(value);}
  let text='';const decoder=new TextDecoder();for(const c of chunks)text+=decoder.decode(c,{stream:true});text+=decoder.decode();
  let e;try{e=JSON.parse(text);if(!e||e.format!=='identity-hub-encrypted'||e.version!==1||e.iterations!==600000||Object.keys(e).some(k=>!['format','version','iterations','salt','iv','data'].includes(k))||typeof e.salt!=='string'||typeof e.iv!=='string'||typeof e.data!=='string'||!/^[A-Za-z0-9+/]{22}==$/.test(e.salt)||!/^[A-Za-z0-9+/]{16}$/.test(e.iv)||!/^[A-Za-z0-9+/]+={0,2}$/.test(e.data)||e.data.length<24)throw Error();}catch{return reply({error:'Only encrypted directory envelopes accepted'},400);}
  const conditional=new Headers();if(match)conditional.set('If-Match',match);else conditional.set('If-None-Match','*');

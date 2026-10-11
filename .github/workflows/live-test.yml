@@ -30,6 +30,10 @@ jobs:
         env:
           HUB_TEST_URL: https://vervemusic.github.io/identity-hub/
           TEST_BROWSER: ${{ matrix.browser }}
+      - run: node capacity-browser-test.cjs
+        env:
+          HUB_TEST_URL: https://vervemusic.github.io/identity-hub/
+          TEST_BROWSER: ${{ matrix.browser }}
       - if: matrix.browser == 'chromium'
         run: node robustness-test.cjs
 
