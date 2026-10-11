@@ -1,7 +1,7 @@
 name: Test published application on Windows
 on:
   push:
-    paths: [.github/workflows/windows-test.yml]
+    paths: [.github/workflows/windows-test.yml, install-test.cjs]
   workflow_dispatch:
 permissions:
   contents: read
