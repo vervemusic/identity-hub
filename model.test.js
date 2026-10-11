@@ -1,0 +1,5 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {normalize,parseImport,mergeAccounts,matches} from './model.js';
+const account={name:'Music',username:'artist',category:'Music',url:'https://example.com/login'};
+test('validate metadata and filter identities',()=>{assert.equal(normalize(account).name,'Music');assert.ok(matches(account,'ARTIST','Music'));assert.ok(!matches(account,'artist','Personal'));});
+test('reject secret fields and unsafe URLs',()=>{for(const extra of ['password','token','recoveryCode','notes'])assert.throws(()=>normalize({...account,[extra]:'secret'}));for(const url of ['javascript:alert(1)','http://example.com','https://u:p@example.com','https://example.com?token=x','https://example.com/#secret'])assert.throws(()=>normalize({...account,url}));});
+test('import is validated entirely before merging',()=>{assert.throws(()=>parseImport(JSON.stringify([account,{...account,password:'secret'}])));assert.throws(()=>parseImport('{}'));assert.equal(mergeAccounts([account],[account]).added,0);assert.equal(mergeAccounts([],[account]).added,1);});
