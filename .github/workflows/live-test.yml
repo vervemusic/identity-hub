@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - browser-test.cjs
+      - robustness-test.cjs
       - .github/workflows/live-test.yml
   workflow_dispatch:
 permissions:
@@ -17,6 +18,8 @@ jobs:
           node-version: '22'
       - run: npm install --no-save playwright@1.61.1
       - run: npx playwright install --with-deps chromium
-      - run: node browser-test.cjs
+      - run: |
+          node browser-test.cjs
+          node robustness-test.cjs
         env:
           HUB_TEST_URL: https://vervemusic.github.io/identity-hub/
